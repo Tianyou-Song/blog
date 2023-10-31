@@ -11,34 +11,20 @@ type Props = {
 const Layout = ({ preview, children }: Props) => {
   const [cookies, setCookie] = useCookies(['loggedIn']);
 
-  const logInOutButton = cookies.loggedIn ? (
-    <span
-      onClick={() => {
-        setCookie('loggedIn', false, {
-          path: '/',
-        });
-      }}
-    >
-      click here to log out
-    </span>
-  ) : (
-    <span
-      onClick={() => {
-        setCookie('loggedIn', true, {
-          path: '/',
-        });
-      }}
-    >
-      click here to log in
-    </span>
-  );
-
   return (
     <>
       <Meta />
       <div className="min-h-screen">
         <Alert preview={preview} />
-        {logInOutButton}
+        <span
+          onClick={() => {
+            setCookie('loggedIn', !cookies.loggedIn, {
+              path: '/',
+            });
+          }}
+        >
+          click here to log {cookies.loggedIn ? 'out' : 'in'}
+        </span>
         <main>{children}</main>
       </div>
       <Footer />
