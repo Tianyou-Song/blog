@@ -11,6 +11,7 @@ import Head from 'next/head'
 import { CMS_NAME } from '../../lib/constants'
 import markdownToHtml from '../../lib/markdownToHtml'
 import PostType from '../../types/post'
+import { useCookies } from 'react-cookie';
 
 type Props = {
   post: PostType
@@ -19,7 +20,29 @@ type Props = {
 }
 
 const Post = ({ post, morePosts, preview }: Props) => {
-  const router = useRouter()
+  const router = useRouter();
+  const [cookies, setCookie] = useCookies(['loggedIn']);
+
+  if (post.premium && !cookies.loggedIn) {
+    return (
+      <>
+        <div>
+          please log in
+        </div>
+        <span
+          onClick={() => {
+            setCookie('loggedIn', true, {
+              path: '/',
+            });
+          }}
+          style={{ marginRight: 50 }}
+        >
+            click here to log in
+        </span>
+      </>
+    )
+  }
+
   if (!router.isFallback && !post?.slug) {
     return <ErrorPage statusCode={404} />
   }
@@ -62,6 +85,7 @@ type Params = {
 }
 
 export async function getStaticProps({ params }: Params) {
+
   const post = getPostBySlug(params.slug, [
     'title',
     'date',
@@ -70,6 +94,7 @@ export async function getStaticProps({ params }: Params) {
     'content',
     'ogImage',
     'coverImage',
+    'premium',
   ])
   const content = await markdownToHtml(post.content || '')
 
